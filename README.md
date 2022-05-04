@@ -1,4 +1,4 @@
 # node-HFS
 a nodejs hfs server
 ## npm packages to install
-`npm install express path ws`
+Type this in the terminal before running: `npm install express path ws mime`
