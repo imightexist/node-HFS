@@ -1,0 +1,2 @@
+Welcome to Node HFS by iexist!
+Delete this file if you want
