@@ -1,0 +1,6 @@
+{
+    "password":"yourpasswordhere",
+    "usepassword":false,
+    "allowfolders":true,
+    "port":6004
+}

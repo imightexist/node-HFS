@@ -1,0 +1,224 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node HFS</title>
+    <script>
+        ws = new WebSocket('ws://' + window.location.host);
+        ws.binaryData = "blob";
+        function uploadfile() {
+            upload = document.getElementById('upload');
+            upload.click();
+            upload.addEventListener('change', function (e) {
+                /*
+
+                const fd = new FormData();
+
+                // add all selected files
+                
+                e.target.files.forEach((file) => {
+                    fd.append(e.target.name, file, file.name);
+                });
+                
+                for(let i = 0;i < upload.files.length;i++){
+                    fd.append('upload',upload.files[i],upload.files[i].name)
+                }
+
+                // create the request
+                const xhr = new XMLHttpRequest();
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // we done!
+                    }
+                };
+
+                // path to server would be where you'd normally post the form to
+                xhr.open('POST', '/files', true);
+                xhr.send(fd);
+                */
+                for (let i = 0; i < upload.files.length; i++) {
+                    var reader = new FileReader();
+                    var rawData = new ArrayBuffer();
+                    //alert(file.name);
+
+                    reader.loadend = function () {
+
+                    }
+                    reader.onload = function (e) {
+                        rawData = e.target.result;
+                        //console.log(rawData);
+                        params = new URLSearchParams(window.location.host);
+                        if (!(params.get('dir') == null)){
+                            ws.send(JSON.stringify(['upload', rawData, dir + '/' + upload.files[i].name]));
+                        }else{
+                            ws.send(JSON.stringify(['upload', rawData, dir + '/' + upload.files[i].name]));
+                        }
+                        
+                    }
+
+                    reader.readAsDataURL(upload.files[i]);
+                }
+                alert('file uploaded, refresh to see it');
+                /*
+                upload.files.forEach(function (file) {
+                    var reader = new FileReader();
+                    var rawData = new ArrayBuffer();
+                    //alert(file.name);
+
+                    reader.loadend = function () {
+
+                    }
+                    reader.onload = function (e) {
+                        rawData = e.target.result;
+                        ws.send(rawData);
+                        alert("the File has been transferred.")
+                        ws.send('end');
+                    }
+
+                    reader.readAsArrayBuffer(file);
+                });
+                */
+            });
+        }
+        function logout() {
+            ws.send(JSON.stringify(['logout']));
+            document.getElementById('upload-button').style.display = "none";
+            document.getElementById('mkdir').style.display = "none";
+            document.getElementById('logout').style.display = "none";
+            document.getElementById('login').style.display = "inline-block";
+        }
+        window.onload = function () {
+            params = new URLSearchParams(window.location.search)
+            if (params.get('dir') == null) {
+                document.getElementById('directory').innerHTML = "Directory: /"
+                ws.send(JSON.stringify(['dir', '/']))
+                dir = '/'
+            } else {
+                document.getElementById('directory').innerHTML = "Directory: /" + params.get('dir');
+                ws.send(JSON.stringify(['dir', '/' + params.get('dir')]))
+                dir = '/' + params.get('dir')
+            }
+        }
+        function download(name){
+            ws.send(JSON.stringify(['readfile',dir + '/' + name]));
+        }
+        ws.onmessage = function (e) {
+            message = JSON.parse(e.data);
+            console.log(message);
+            if (message[0] == 'usepassword') {
+                if (message[1]) {
+                    document.getElementById('upload-button').style.display = "none";
+                    document.getElementById('mkdir').style.display = "none";
+                } else {
+                    document.getElementById('upload-button').style.display = "inline-block";
+                    document.getElementById('mkdir').style.display = "inline-block";
+                    document.getElementById('login').style.display = "none";
+                }
+            }
+            if (message[0] == "login") {
+                if (message[1] && message[2]) {
+                    /*
+                    document.getElementById('login').style.removeProperty('display');
+                    document.getElementById('upload-button').style.removeProperty('display');
+                    document.getElementById('mkdir').style.removeProperty('display');
+                    document.getElementById('logout').style.removeProperty('display');
+                    */
+                    document.getElementById('upload-button').style.display = "inline-block";
+                    document.getElementById('mkdir').style.display = "inline-block";
+                    document.getElementById('logout').style.display = "inline-block";
+                    document.getElementById('login').style.display = "none";
+                }
+            }
+            if (message[0] == 'dir') {
+                message[1].forEach(function (file) {
+                    li = document.createElement('a');
+                    li.style = "color:white;font-family:'Segoe UI';font-size:20px";
+                    li.innerHTML = file;
+                    document.getElementById('dir').appendChild(li);
+                    document.getElementById('dir').appendChild(document.createElement('br'));
+                })
+            }
+            if (message[0] == 'addfile') {
+                li = document.createElement('a');
+                li.style = "color:white;font-family:'Segoe UI';font-size:20px";
+                li.innerHTML = message[1];
+                li.href = "javascript:download('" + message[1] + "')"
+                document.getElementById('dir').appendChild(li);
+                document.getElementById('dir').appendChild(document.createElement('br'));
+            }
+            if (message[0] == 'addfolder') {
+                li = document.createElement('a');
+                li.href = window.location.href + "?dir=" + message[1];
+                li.style = "color:white;font-family:'Segoe UI';font-size:20px";
+                li.innerHTML = message[1];
+                document.getElementById('dir').appendChild(li);
+                document.getElementById('dir').appendChild(document.createElement('br'));
+            }
+            if (message[0] == 'download'){
+                
+                link = document.createElement('a');
+                link.style.display = "none";
+                link.href = message[1];
+                link.download = message[2];
+                document.body.appendChild(link);
+                link.click();
+                
+                //fetch(message[1]);
+            }
+        }
+    </script>
+    <style>
+        /*
+        .upload {
+            background-color: red;
+            font-size: 30px;
+            font-family: 'Segoe UI';
+            color: white;
+            border: none
+        }
+
+        .upload:hover {
+            background-color: #e30000;
+        }
+        */
+
+        button {
+            background-color: rgb(10, 151, 233);
+            font-size: 30px;
+            font-family: 'Segoe UI';
+            color: white;
+            border: none
+        }
+
+        button:hover {
+            background-color: rgb(32, 126, 204);
+        }
+
+        body {
+            background-color: #242424;
+        }
+
+        button {
+            cursor: pointer
+        }
+    </style>
+</head>
+
+<body>
+    <a style="color:white;font-family:'Segoe UI';font-size:30px">Node HFS by iexist | </a>
+    <button onclick="uploadfile()" id="upload-button">Upload Files</button>
+    <button
+        onclick="ws.send(JSON.stringify(['mkdir',prompt('Folder name')]));alert('Folder created, refresh to see it')"
+        id="mkdir">Create Folder</button>
+    <!--<a style="color:white;font-family:'Segoe UI';font-size:30px"> | </a>-->
+    <button onclick="ws.send(JSON.stringify(['login',prompt('Password')]))" class="login" id="login">Login</button>
+    <button onclick="logout()" style="display:none" id="logout">Logout</button>
+    <hr>
+    <input type="file" id="upload" class="upload" text="Upload Files" style="display:none" name="upload">
+    <a style="color:white;font-family:'Segoe UI';font-size:20px" id="directory">Directory</a>
+    <div id="dir"><br></div>
+</body>
+
+</html>
