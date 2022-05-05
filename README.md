@@ -9,6 +9,7 @@ you have to download using websocket, not sorry.
 ```javascript
 const websocketClient = require('websocket').client;
 const ws = new websocketClient();
+const fs = require('fs')
 ws.on('connection',function(f){
   f.sendUTF(JSON.stringify(['readfile','test.txt']));
   f.on('message',function(msg){
