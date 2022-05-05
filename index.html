@@ -92,21 +92,15 @@
             document.getElementById('logout').style.display = "none";
             document.getElementById('login').style.display = "inline-block";
         }
-        ws.onload = function(){
-            params = new URLSearchParams(window.location.search)
-            if (params.get('dir') == null) {
-                ws.send(JSON.stringify(['dir', '/']))
-            } else {
-                ws.send(JSON.stringify(['dir', '/' + params.get('dir')]))
-            }
-        }
         window.onload = function () {
             params = new URLSearchParams(window.location.search)
             if (params.get('dir') == null) {
                 document.getElementById('directory').innerHTML = "Directory: /"
+                ws.send(JSON.stringify(['dir', '/']))
                 dir = '/'
             } else {
                 document.getElementById('directory').innerHTML = "Directory: /" + params.get('dir');
+                ws.send(JSON.stringify(['dir', '/' + params.get('dir')]))
                 dir = '/' + params.get('dir')
             }
         }
