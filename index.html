@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Node HFS</title>
     <script>
-        ws = new WebSocket('ws://' + window.location.host);
+        if (location.protocol == "https:"){ ws = new WebSocket('wss://' + window.location.host);}
+        else{ ws = new WebSocket('ws://' + window.location.host);}
+        
         ws.binaryData = "blob";
         function uploadfile() {
             upload = document.getElementById('upload');
@@ -42,6 +44,7 @@
                     var reader = new FileReader();
                     var rawData = new ArrayBuffer();
                     //alert(file.name);
+                    //console.log(upload.files[i].size);
 
                     reader.loadend = function () {
 
