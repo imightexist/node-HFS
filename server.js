@@ -129,8 +129,15 @@ app.post('/files',function(req,res){
 })
 */
 app.use('/', function (req, res) {
-    res.sendFile(__dirname + '/index.html');
+    //console.log(fs.existsSync(__dirname + '/files' + req.path));
+    if (fs.existsSync(__dirname + '/files' + req.path) && fs.lstatSync(__dirname + '/files' + req.path).isFile()){
+        res.sendFile(__dirname + '/files' + req.path);
+    }else{
+        res.sendFile(__dirname + '/index.html');
+    }
+    
 });
+
 httpServer.on('request', app);
 //app.listen(webserverPort);
 httpServer.listen(port.toString());

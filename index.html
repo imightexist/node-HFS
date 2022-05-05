@@ -92,15 +92,21 @@
             document.getElementById('logout').style.display = "none";
             document.getElementById('login').style.display = "inline-block";
         }
+        ws.onload = function(){
+            params = new URLSearchParams(window.location.search)
+            if (params.get('dir') == null) {
+                ws.send(JSON.stringify(['dir', '/']))
+            } else {
+                ws.send(JSON.stringify(['dir', '/' + params.get('dir')]))
+            }
+        }
         window.onload = function () {
             params = new URLSearchParams(window.location.search)
             if (params.get('dir') == null) {
                 document.getElementById('directory').innerHTML = "Directory: /"
-                ws.send(JSON.stringify(['dir', '/']))
                 dir = '/'
             } else {
                 document.getElementById('directory').innerHTML = "Directory: /" + params.get('dir');
-                ws.send(JSON.stringify(['dir', '/' + params.get('dir')]))
                 dir = '/' + params.get('dir')
             }
         }
@@ -147,13 +153,15 @@
                 li = document.createElement('a');
                 li.style = "color:white;font-family:'Segoe UI';font-size:20px";
                 li.innerHTML = message[1];
-                li.href = "javascript:download('" + message[1] + "')"
+                //li.href = "javascript:download('" + message[1] + "')"
+                li.href = message[1];
+                li.download = message[1];
                 document.getElementById('dir').appendChild(li);
                 document.getElementById('dir').appendChild(document.createElement('br'));
             }
             if (message[0] == 'addfolder') {
                 li = document.createElement('a');
-                li.href = window.location.href + "?dir=" + message[1];
+                li.href = "/?dir=" + message[1];
                 li.style = "color:white;font-family:'Segoe UI';font-size:20px";
                 li.innerHTML = message[1];
                 document.getElementById('dir').appendChild(li);
@@ -169,6 +177,15 @@
                 link.click();
                 
                 //fetch(message[1]);
+            }
+        }
+        function mkdir(name){
+            if (dir == '/'){
+                ws.send(JSON.stringify(['mkdir',name]));
+                alert('Folder created, refresh to see it');
+            }else{
+                ws.send(JSON.stringify(['mkdir',dir.substring(1) + '/' + name]));
+                alert('Folder created, refresh to see it');
             }
         }
     </script>
@@ -213,7 +230,7 @@
     <a style="color:white;font-family:'Segoe UI';font-size:30px">Node HFS by iexist | </a>
     <button onclick="uploadfile()" id="upload-button">Upload Files</button>
     <button
-        onclick="ws.send(JSON.stringify(['mkdir',prompt('Folder name')]));alert('Folder created, refresh to see it')"
+        onclick="mkdir(prompt('Folder name'))"
         id="mkdir">Create Folder</button>
     <!--<a style="color:white;font-family:'Segoe UI';font-size:30px"> | </a>-->
     <button onclick="ws.send(JSON.stringify(['login',prompt('Password')]))" class="login" id="login">Login</button>
