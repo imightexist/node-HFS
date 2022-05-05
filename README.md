@@ -24,4 +24,5 @@ ws.on('connection',function(f){
     }
   }
 }
+ws.connect("wss://hfs.astroistaken.repl.co");
 ```
