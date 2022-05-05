@@ -15,6 +15,8 @@ ws.on('connection',function(f){
   f.on('message',function(msg){
     message = JSON.parse(msg);
     if (message[0] == "download"){
+      //message 1 is a data url
+      //message 2 is the filename
       var regex = /^data:.+\/(.+);base64,(.*)$/;
 
       var matches = message[1].match(regex);
