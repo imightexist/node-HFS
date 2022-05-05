@@ -26,3 +26,7 @@ ws.on('connection',function(f){
 }
 ws.connect("wss://hfs.astroistaken.repl.co");
 ```
+## Demo
+https://hfs.astroistaken.repl.co
+
+You can only upload 1 mb files
