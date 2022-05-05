@@ -4,8 +4,8 @@ a nodejs hfs server
 Type this in the terminal before running: `npm install express path ws mime`
 ## Warning
 if you need to, change the password in .env instead of config.json and change the code as well.
-## interacting with the server on nodejs
-you have to download using websocket, not sorry.
+## downloading with websocket
+We have added direct downloads. you're welcome, but you can still download with websocket.
 ```javascript
 const websocketClient = require('websocket').client;
 const ws = new websocketClient();
